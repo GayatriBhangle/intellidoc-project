@@ -1,31 +1,33 @@
-#use python 3.11 slim image (lightweight)
+# Use Python 3.11 slim image
 FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
-# COpy requirements file
+# Copy requirements first (for layer caching)
 COPY requirements.txt .
 
-# install pyton packages
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy entire project
+# Copy project files
 COPY . .
 
-# Create uploads directory for file storage
+# Create uploads directory
 RUN mkdir -p uploads
 
-# Set Flask app
-ENV FLASK_APP=app/main.py
-
-# Expose port 10000 (Render uses dynamic ports)
+# Expose port
 EXPOSE 10000
 
-# Run the flask app
-CMD["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=10000"]
+# Set environment
+ENV FLASK_APP=app/main.py
+ENV PYTHONUNBUFFERED=1
+
+# Run Flask
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=10000"]
