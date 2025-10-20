@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import os
 from dotenv import load_dotenv
-from document_processor import DocumentProcessor
-from ai_analyzer import AIAnalyzer
+from .document_processor import DocumentProcessor
+from .ai_analyzer import AIAnalyzer
 
 load_dotenv()
 
@@ -108,4 +108,5 @@ def analyze_sentiment():
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 10000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    debug_mode = os.getenv('FLASK_ENV') == 'development'
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
